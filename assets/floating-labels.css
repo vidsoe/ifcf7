@@ -1,0 +1,115 @@
+.ifcf7-floating-labels {
+    display: block;
+    position: relative;
+}
+
+.ifcf7-floating-labels input,
+.ifcf7-floating-labels label {
+    height: 3.125rem;
+    padding: .75rem;
+}
+
+.ifcf7-floating-labels > textarea {
+    height: 6.25rem;
+    padding: .75rem;
+    resize: none;
+    overflow: hidden;
+}
+
+.ifcf7-floating-labels select {
+    height: 3.125rem;
+    padding: .75rem;
+}
+
+.ifcf7-floating-labels label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 100%;
+    margin-bottom: 0; /* Override default `<label>` margin */
+    line-height: 1.5;
+    color: var(--gray);
+    pointer-events: none;
+    cursor: text; /* Match the input under the label */
+    border: 1px solid transparent;
+    border-radius: .25rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ifcf7-floating-labels input::-webkit-input-placeholder,
+.ifcf7-floating-labels textarea::-webkit-input-placeholder {
+    color: transparent;
+}
+
+.ifcf7-floating-labels input::-moz-placeholder,
+.ifcf7-floating-labels textarea::-moz-placeholder {
+    color: transparent;
+}
+
+.ifcf7-floating-labels input::placeholder,
+.ifcf7-floating-labels textarea::placeholder {
+    color: transparent;
+}
+
+.ifcf7-floating-labels input:not(:-moz-placeholder-shown),
+.ifcf7-floating-labels textarea:not(:-moz-placeholder-shown) {
+    padding-top: 1.25rem;
+    padding-bottom: .25rem;
+}
+
+.ifcf7-floating-labels input:not(:placeholder-shown),
+.ifcf7-floating-labels textarea:not(:placeholder-shown) {
+    padding-top: 1.25rem;
+    padding-bottom: .25rem;
+}
+
+.ifcf7-floating-labels input:-webkit-autofill,
+.ifcf7-floating-labels textarea:-webkit-autofill {
+    padding-top: 1.25rem;
+    padding-bottom: .25rem;
+}
+
+.ifcf7-floating-labels select.placeholder-hidden {
+    padding-top: 1.25rem;
+    padding-bottom: .25rem;
+}
+
+.ifcf7-floating-labels input:not(:-moz-placeholder-shown) ~ label,
+.ifcf7-floating-labels textarea:not(:-moz-placeholder-shown) ~ label {
+    padding-top: .25rem;
+    padding-bottom: .25rem;
+    font-size: 12px;
+    color: var(--gray);
+}
+
+.ifcf7-floating-labels input:not(:placeholder-shown) ~ label,
+.ifcf7-floating-labels textarea:not(:placeholder-shown) ~ label {
+    padding-top: .25rem;
+    padding-bottom: .25rem;
+    font-size: 12px;
+    color: var(--gray);
+}
+
+.ifcf7-floating-labels input:-webkit-autofill ~ label,
+.ifcf7-floating-labels textarea:-webkit-autofill ~ label {
+    padding-top: .25rem;
+    padding-bottom: .25rem;
+    font-size: 12px;
+    color: var(--gray);
+}
+
+.ifcf7-floating-labels select.placeholder-hidden ~ label {
+    padding-top: .25rem;
+    padding-bottom: .25rem;
+    font-size: 12px;
+    color: var(--gray);
+}
+
+.ifcf7-floating-labels input:focus ~ label,
+.ifcf7-floating-labels select:focus ~ label,
+.ifcf7-floating-labels textarea:focus ~ label {
+    color: var(--gray);
+}

@@ -1,0 +1,11 @@
+.ifcf7-editor-container {
+	background-color: #272822;
+	border-radius: 4px;
+	box-sizing: border-box;
+	padding: 4px;
+	width: 99%;
+}
+#tag-generator-list,
+#wpcf7-form {
+	display: none;
+}
