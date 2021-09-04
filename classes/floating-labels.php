@@ -29,53 +29,43 @@ final class Floating_Labels {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	private static function select_html($html = '', $tag = null){
-        $html = str_get_html($html);
-        $wrapper = $html->find('.wpcf7-form-control-wrap', 0);
-        $select = $wrapper->find('select', 0);
-        $select->addClass('custom-select');
-		if($tag->has_option('include_blank') and $tag->has_option('select2')){
-            $select->addClass('ifcf7-select2');
-        } else {
-			$placeholder = self::placeholder_value($tag);
-			if(!empty($placeholder)){
-				$wrapper->addClass('ifcf7-floating-labels');
-				$option = $select->find('option', 0);
-				$option->innertext = '';
-				$select->outertext = $select->outertext . '<label>' . $placeholder . '</label>';
-			}
-		}
+		$placeholder = self::placeholder_value($tag);
+		$html = str_get_html($html);
+		$wrapper = $html->find('.wpcf7-form-control-wrap', 0);
+		$wrapper->addClass('ifcf7-floating-labels');
+		$select = $wrapper->find('select', 0);
+		$select->addClass('custom-select');
+		$option = $select->find('option', 0);
+		$option->innertext = '';
+		$select->outertext = $select->outertext . '<label>' . $placeholder . '</label>';
         return $html;
     }
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	private static function text_html($html = '', $tag = null){
-        $html = str_get_html($html);
-        $wrapper = $html->find('.wpcf7-form-control-wrap', 0);
-        $input = $wrapper->find('input', 0);
-        $input->addClass('form-control');
 		$placeholder = self::placeholder_value($tag);
-        if(!empty($placeholder)){
-			$wrapper->addClass('ifcf7-floating-labels');
-			$input->outertext = $input->outertext . '<label>' . $placeholder . '</label>';
-        }
+        $html = str_get_html($html);
+		$wrapper = $html->find('.wpcf7-form-control-wrap', 0);
+		$wrapper->addClass('ifcf7-floating-labels');
+		$input = $wrapper->find('input', 0);
+		$input->addClass('form-control');
+		$input->outertext = $input->outertext . '<label>' . $placeholder . '</label>';
         return $html;
     }
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	private static function textarea_html($html = '', $tag = null){
-        $html = str_get_html($html);
-        $wrapper = $html->find('.wpcf7-form-control-wrap', 0);
-        $textarea = $wrapper->find('textarea', 0);
-        $textarea->addClass('form-control');
 		$placeholder = self::placeholder_value($tag);
-        if(!empty($placeholder)){
-			$wrapper->addClass('ifcf7-floating-labels');
-            $textarea->cols = null;
-			$textarea->rows = null;
-			$textarea->outertext = $textarea->outertext . '<label>' . $placeholder . '</label>';
-        }
+        $html = str_get_html($html);
+		$wrapper = $html->find('.wpcf7-form-control-wrap', 0);
+		$textarea = $wrapper->find('textarea', 0);
+		$textarea->addClass('form-control');
+		$wrapper->addClass('ifcf7-floating-labels');
+		$textarea->cols = null;
+		$textarea->rows = null;
+		$textarea->outertext = $textarea->outertext . '<label>' . $placeholder . '</label>';
         return $html;
     }
 
@@ -86,6 +76,10 @@ final class Floating_Labels {
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	public static function form_tag_html($html, $tag, $type, $basetype, $html_orig){
+		$placeholder = self::placeholder_value($tag);
+		if(empty($placeholder)){
+			return $html;
+		}
 		if(!function_exists('str_get_html')){
 			require_once(plugin_dir_path(Loader::get_file()) . 'includes/simple-html-dom-1.9.1.php');
         }
@@ -114,7 +108,7 @@ final class Floating_Labels {
     public static function load(){
 		add_action('wpcf7_enqueue_scripts', [__CLASS__, 'wpcf7_enqueue_scripts']);
 		add_action('wpcf7_enqueue_styles', [__CLASS__, 'wpcf7_enqueue_styles']);
-		add_filter('ifcf7_form_tag_html', [__CLASS__, 'form_tag_html'], 20, 5);
+		add_filter('ifcf7_form_tag_html', [__CLASS__, 'form_tag_html'], 30, 5);
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

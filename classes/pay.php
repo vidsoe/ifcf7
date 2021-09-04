@@ -81,7 +81,8 @@ final class Pay {
 			$missing[] = 'reCAPTCHA';
 		}
 		$tags = wp_list_pluck($contact_form->scan_form_tags(), 'type', 'name');
-		$fields = ['cc-amount', 'cc-csc', 'cc-exp-mm', 'cc-exp-yy', 'cc-number', 'cc-name'];
+		//$fields = ['cc-amount', 'cc-csc', 'cc-exp-mm', 'cc-exp-yy', 'cc-number', 'cc-name'];
+		$fields = ['cc-amount', 'cc-csc', 'cc-exp-mm', 'cc-exp-yy', 'cc-number'];
 		foreach($fields as $field){
 			if(!isset($tags[$field])){
 				$missing[] = $field;
@@ -104,9 +105,9 @@ final class Pay {
 		if($tags['cc-exp-yy'] !== 'select*'){
 			$invalid[] = 'cc-exp-yy';
 		}
-		if($tags['cc-name'] !== 'text*'){
+		/*if($tags['cc-name'] !== 'text*'){
 			$invalid[] = 'cc-name';
-		}
+		}*/
 		if($tags['cc-number'] !== 'number*'){
 			$invalid[] = 'cc-number';
 		}
@@ -189,7 +190,8 @@ final class Pay {
 		if(!self::is_action()){
 			return $posted_data;
 		}
-		$fields = ['cc-amount', 'cc-csc', 'cc-exp-mm', 'cc-exp-yy', 'cc-number', 'cc-name'];
+		//$fields = ['cc-amount', 'cc-csc', 'cc-exp-mm', 'cc-exp-yy', 'cc-number', 'cc-name'];
+		$fields = ['cc-amount', 'cc-csc', 'cc-exp-mm', 'cc-exp-yy', 'cc-number'];
 		foreach($fields as $field){
 			if(isset($posted_data[$field])){
 				self::$posted_data[$field] = $posted_data[$field];

@@ -97,9 +97,6 @@ final class Bootstrap_4 {
         $wrapper = $html->find('.wpcf7-form-control-wrap', 0);
         $select = $wrapper->find('select', 0);
 		$select->addClass('custom-select');
-		if($tag->has_option('include_blank') and $tag->has_option('select2')){
-            $select->addClass('ifcf7-select2');
-        }
         return $html;
     }
 
