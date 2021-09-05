@@ -47,7 +47,7 @@ final class Shortcodes {
         if(null === $posted_data){
             $posted_data = '';
         }
-        if('' === ){
+        if('' === $posted_data){
             switch($compare){
                 case 'EXISTS':
                     if('' !== $posted_data){
