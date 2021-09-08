@@ -82,14 +82,14 @@ final class Edit_Post {
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	private static function output($post_id, $attr, $content, $tag){
+	/*private static function output($post_id, $attr, $content, $tag){
 		global $post;
 		$post = get_post($post_id);
 		setup_postdata($post);
 		$output = wpcf7_contact_form_tag_func($attr, $content, $tag);
 		wp_reset_postdata();
 		return $output;
-	}
+	}*/
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -147,8 +147,8 @@ final class Edit_Post {
 		if(is_wp_error($post_id)){
 			return '<div class="alert alert-danger" role="alert">' . $post_id->get_error_message() . '</div>';
 		}
-		$content = isset($m[5]) ? $m[5] : null;
-		$output = self::output($post_id, $attr, $content, $tag);
+		//$content = isset($m[5]) ? $m[5] : null;
+		//$output = self::output($post_id, $attr, $content, $tag);
 		return $output;
 	}
 
@@ -159,6 +159,7 @@ final class Edit_Post {
 		add_filter('do_shortcode_tag', [__CLASS__, 'do_shortcode_tag'], 10, 4);
 		add_filter('ifcf7_free_text_value', [__CLASS__, 'ifcf7_free_text_value'], 10, 2);
 		add_filter('shortcode_atts_wpcf7', [__CLASS__, 'shortcode_atts_wpcf7'], 10, 3);
+		add_filter('wpcf7_form_elements', [__CLASS__, 'wpcf7_form_elements']);
 		add_filter('wpcf7_form_hidden_fields', [__CLASS__, 'wpcf7_form_hidden_fields']);
     }
 
@@ -205,7 +206,22 @@ final class Edit_Post {
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+	public static function wpcf7_form_elements($elements){
+		if(!self::is_action()){
+			return $elements;
+		}
+		$post_id = self::get_post_id();
+		if(is_wp_error($post_id)){
+			return $elements;
+		}
+		wp_reset_postdata();
+		return $elements;
+	}
+
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 	public static function wpcf7_form_hidden_fields($hidden_fields){
+		global $post;
 		if(!self::is_action()){
 			return $hidden_fields;
 		}
@@ -215,6 +231,8 @@ final class Edit_Post {
 		}
 		$hidden_fields['ifcf7_nonce'] = wp_create_nonce('ifcf7-edit-post_' . $post_id);
 		$hidden_fields['ifcf7_post_id'] = $post_id;
+		$post = get_post($post_id);
+		setup_postdata($post);
 		return $hidden_fields;
 	}
 

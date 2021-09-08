@@ -8,11 +8,37 @@ final class Select2 {
 	//
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    private static function placeholder_value($tag = null, $fallback = ''){
+        if(empty($tag->values)){
+            return $fallback;
+        }
+        if(in_array($tag->basetype, ['date', 'email', 'number', 'password', 'tel', 'text', 'textarea', 'url'])){
+            if(!$tag->has_option('placeholder') and !$tag->has_option('watermark')){
+                return $fallback;
+            }
+            return (string) reset($tag->values);
+        } elseif('select' === $tag->basetype){
+            if(!$tag->has_option('first_as_label')){
+                return $fallback;
+            }
+            return (string) reset($tag->values);
+        }
+        return $fallback;
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 	private static function select_html($html = '', $tag = null){
 		$html = str_get_html($html);
 		$wrapper = $html->find('.wpcf7-form-control-wrap', 0);
 		$select = $wrapper->find('select', 0);
 		$select->addClass('form-control ifcf7-select2');
+		$data_attr = 'data-placeholder';
+		if($tag->has_option('include_blank')){
+			$select->{$data_attr} = '---';
+		} else {
+			$select->{$data_attr} = self::placeholder_value($tag);
+		}
         return $html;
     }
 
@@ -23,7 +49,13 @@ final class Select2 {
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	public static function form_tag_html($html, $tag, $type, $basetype, $html_orig){
-		if('select' !== $type or !$tag->has_option('include_blank')){
+		if('select' !== $type){
+			return $html;
+		}
+		if(!$tag->has_option('select2')){
+			return $html;
+		}
+		if(!$tag->has_option('include_blank') and empty(self::placeholder_value($tag))){
 			return $html;
 		}
 		if(!function_exists('str_get_html')){
@@ -38,7 +70,7 @@ final class Select2 {
     public static function load(){
 		add_action('wpcf7_enqueue_scripts', [__CLASS__, 'wpcf7_enqueue_scripts']);
 		add_action('wpcf7_enqueue_styles', [__CLASS__, 'wpcf7_enqueue_styles']);
-		add_filter('ifcf7_form_tag_html', [__CLASS__, 'form_tag_html'], 20, 5);
+		add_filter('ifcf7_form_tag_html', [__CLASS__, 'form_tag_html'], 30, 5);
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

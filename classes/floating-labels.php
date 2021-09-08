@@ -108,7 +108,7 @@ final class Floating_Labels {
     public static function load(){
 		add_action('wpcf7_enqueue_scripts', [__CLASS__, 'wpcf7_enqueue_scripts']);
 		add_action('wpcf7_enqueue_styles', [__CLASS__, 'wpcf7_enqueue_styles']);
-		add_filter('ifcf7_form_tag_html', [__CLASS__, 'form_tag_html'], 30, 5);
+		add_filter('ifcf7_form_tag_html', [__CLASS__, 'form_tag_html'], 20, 5);
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

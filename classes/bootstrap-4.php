@@ -24,6 +24,7 @@ final class Bootstrap_4 {
 			$label->addClass('custom-control-label');
 			$label->for = $id;
 			$label->tag = 'label';
+			$freetext = '';
             if($li->hasClass('has-free-text')){
                 $freetext = $li->find('.wpcf7-free-text', 0);
                 $freetext->addClass('form-control mt-1');

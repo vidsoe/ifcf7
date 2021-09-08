@@ -8,6 +8,10 @@ final class Edit_User {
 	//
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+	private static $current_user_id = 0;
+
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 	private static function get_user_id($contact_form = null, $submission = null){
 		if(null === $contact_form){
 			$contact_form = wpcf7_get_current_contact_form();
@@ -74,7 +78,7 @@ final class Edit_User {
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	private static function output($output, $user_id, $attr, $content, $tag){
+	/*private static function output($output, $user_id, $attr, $content, $tag){
 		if(!function_exists('str_get_html')){
 			require_once(plugin_dir_path(Loader::get_file()) . 'includes/simple-html-dom-1.9.1.php');
         }
@@ -105,7 +109,7 @@ final class Edit_User {
 		}
 		$output = $html->save();
 		return $output;
-	}
+	}*/
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -163,8 +167,8 @@ final class Edit_User {
 		if(is_wp_error($user_id)){
 			return '<div class="alert alert-danger" role="alert">' . $user_id->get_error_message() . '</div>';
 		}
-		$content = isset($m[5]) ? $m[5] : null;
-		$output = self::output($output, $user_id, $attr, $content, $tag);
+		//$content = isset($m[5]) ? $m[5] : null;
+		//$output = self::output($output, $user_id, $attr, $content, $tag);
 		return $output;
 	}
 
@@ -221,6 +225,21 @@ final class Edit_User {
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+	public static function wpcf7_form_elements($elements){
+		if(!self::is_action()){
+			return $elements;
+		}
+		$user_id = self::get_user_id();
+		if(is_wp_error($user_id)){
+			return $elements;
+		}
+		wp_set_current_user(self::$current_user_id);
+		self::$current_user_id = 0;
+		return $elements;
+	}
+
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 	public static function wpcf7_form_hidden_fields($hidden_fields){
 		if(!self::is_action()){
 			return $hidden_fields;
@@ -231,6 +250,8 @@ final class Edit_User {
 		}
 		$hidden_fields['ifcf7_nonce'] = wp_create_nonce('ifcf7-edit-user_' . $user_id);
 		$hidden_fields['ifcf7_user_id'] = $user_id;
+		self::$current_user_id = get_current_user_id();
+		wp_set_current_user($user_id);
 		return $hidden_fields;
 	}
 
