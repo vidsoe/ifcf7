@@ -21,7 +21,8 @@ final class TinyMCE {
 			'textarea_rows' => 10,
 			'tinymce'=> [
 				'autoresize_min_height' => 210,
-				'toolbar1' => 'formatselect,bold,italic,underline,bullist,numlist,blockquote,alignleft,aligncenter,alignright,outdent,indent,sub,sup,undo,redo',
+				'plugins' => 'lists,wpautoresize',
+				'toolbar1' => 'formatselect,bold,italic,underline,bullist,numlist,blockquote,alignleft,aligncenter,alignright,outdent,indent,undo,redo',
 				'toolbar2' => '',
 				'toolbar3' => '',
 				'wp_autoresize_on' => true,
