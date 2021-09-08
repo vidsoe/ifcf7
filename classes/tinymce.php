@@ -21,11 +21,10 @@ final class TinyMCE {
 			'textarea_rows' => 10,
 			'tinymce'=> [
 				'autoresize_min_height' => 210,
-				'wp_autoresize_on' => true,
-				'plugins' => 'wpautoresize',
 				'toolbar1' => 'formatselect,bold,italic,underline,bullist,numlist,blockquote,alignleft,aligncenter,alignright,outdent,indent,sub,sup,undo,redo',
 				'toolbar2' => '',
 				'toolbar3' => '',
+				'wp_autoresize_on' => true,
 			],
 		]);
 		$textarea->outertext = ob_get_clean();
