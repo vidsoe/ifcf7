@@ -179,6 +179,7 @@ final class Edit_User {
 		add_filter('do_shortcode_tag', [__CLASS__, 'do_shortcode_tag'], 10, 4);
 		add_filter('ifcf7_free_text_value', [__CLASS__, 'ifcf7_free_text_value'], 10, 2);
 		add_filter('shortcode_atts_wpcf7', [__CLASS__, 'shortcode_atts_wpcf7'], 10, 3);
+		add_filter('wpcf7_form_elements', [__CLASS__, 'wpcf7_form_elements']);
 		add_filter('wpcf7_form_hidden_fields', [__CLASS__, 'wpcf7_form_hidden_fields']);
     }
 
