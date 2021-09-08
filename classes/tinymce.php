@@ -14,9 +14,10 @@ final class TinyMCE {
 		$textarea = $wrapper->find('textarea', 0);
 		ob_start();
 		wp_editor(html_entity_decode($textarea->innertext), $tag->name, [
+			'editor_class' => $textarea->class,
 			'media_buttons' => false,
-			'textarea_rows' => 10,
 			'quicktags' => false,
+			'textarea_rows' => 10,
 			'tinymce'=> [
 				'autoresize_min_height' => 210,
 				'wp_autoresize_on' => true,
