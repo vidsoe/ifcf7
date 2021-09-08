@@ -35,6 +35,9 @@ final class Floating_Labels {
 		$wrapper->addClass('ifcf7-floating-labels');
 		$select = $wrapper->find('select', 0);
 		$select->addClass('custom-select');
+		if(!empty($select->find('option[selected]', 0)->value)){
+			$select->addClass('placeholder-hidden');
+		}
 		$option = $select->find('option', 0);
 		$option->innertext = '';
 		$select->outertext = $select->outertext . '<label>' . $placeholder . '</label>';

@@ -11,6 +11,7 @@ final class TinyMCE {
 	private static function textarea_html($html = '', $tag = null){
         $html = str_get_html($html);
 		$wrapper = $html->find('.wpcf7-form-control-wrap', 0);
+		$wrapper->addClass('d-none');
 		$textarea = $wrapper->find('textarea', 0);
 		ob_start();
 		wp_editor(html_entity_decode($textarea->innertext), $tag->name, [
@@ -28,6 +29,7 @@ final class TinyMCE {
 			],
 		]);
 		$textarea->outertext = ob_get_clean();
+		$html .= '<div class="ifcf7-tinymce-loading-message ' . $tag->name . '">' . __('Loading&hellip;') . '</div><script>jQuery(function($){ tinymce.editors[\'' . $tag->name . '\'].on(\'init\', function(e){ $(\'.ifcf7-tinymce-loading-message.' . $tag->name . '\').addClass(\'d-none\'); $(\'.wpcf7-form-control-wrap.' . $tag->name . '\').removeClass(\'d-none\'); }); });</script>';
         return $html;
     }
 
