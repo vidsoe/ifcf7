@@ -267,7 +267,23 @@ final class Utilities {
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	public static function wpcf7_form_hidden_fields($hidden_fields){
-		if(!empty($_GET['redirect_to']) and wpcf7_is_url($_GET['redirect_to'])){
+        $inserted_post_id = self::get_inserted_post_id();
+        if(!empty($inserted_post_id) and !is_wp_error($inserted_post_id)){
+            $hidden_fields['ifcf7_inserted_post_id'] = $inserted_post_id;
+        }
+        $inserted_user_id = self::get_inserted_user_id();
+        if(!empty($inserted_user_id) and !is_wp_error($inserted_user_id)){
+            $hidden_fields['ifcf7_inserted_user_id'] = $inserted_user_id;
+        }
+        $updated_post_id = self::get_updated_post_id();
+        if(!empty($updated_post_id) and !is_wp_error($updated_post_id)){
+            $hidden_fields['ifcf7_updated_post_id'] = $updated_post_id;
+        }
+        $updated_user_id = self::get_updated_user_id();
+        if(!empty($updated_user_id) and !is_wp_error($updated_user_id)){
+            $hidden_fields['ifcf7_updated_user_id'] = $updated_user_id;
+        }
+        if(!empty($_GET['redirect_to']) and wpcf7_is_url($_GET['redirect_to'])){
 			$hidden_fields['ifcf7_redirect_to'] = $_GET['redirect_to'];
 		}
 		return $hidden_fields;
