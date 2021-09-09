@@ -36,14 +36,22 @@ final class Utilities {
 		$inserted_user_id = Storage::get_inserted_user_id();
 		$updated_post_id = Storage::get_updated_post_id();
 		$updated_user_id = Storage::get_updated_user_id();
+        $nonce = '';
         if(!empty($inserted_post_id)){
             $url = add_query_arg('inserted_post_id', $inserted_post_id, $url);
+            $nonce = wp_create_nonce('ifcf7-inserted-post_' . $inserted_post_id);
         } elseif(!empty($inserted_user_id)){
             $url = add_query_arg('inserted_user_id', $inserted_user_id, $url);
+            $nonce = wp_create_nonce('ifcf7-inserted-user_' . $inserted_post_id);
         } elseif(!empty($updated_post_id)){
             $url = add_query_arg('updated_post_id', $updated_post_id, $url);
+            $nonce = wp_create_nonce('ifcf7-updated-post_' . $inserted_post_id);
         } elseif(!empty($updated_user_id)){
             $url = add_query_arg('updated_user_id', $updated_user_id, $url);
+            $nonce = wp_create_nonce('ifcf7-updated-user_' . $inserted_post_id);
+        }
+        if(!empty($nonce)){
+            $url = add_query_arg('ifcf7_nonce', $nonce, $url);
         }
 		return $url;
 	}
@@ -109,6 +117,54 @@ final class Utilities {
 	// public
 	//
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	public static function get_inserted_post_id(){
+        if(empty($_GET['inserted_post_id'])){
+            return 0;
+        }
+        if(empty($_GET['ifcf7_nonce']) or !wp_verify_nonce($_GET['ifcf7_nonce'], 'ifcf7-inserted-post_' . $_GET['inserted_post_id'])){
+			return new \WP_Error('ifcf7_error', __('The link you followed has expired.'));
+		}
+		return (int) $_GET['inserted_post_id'];
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	public static function get_inserted_user_id(){
+        if(empty($_GET['inserted_user_id'])){
+            return 0;
+        }
+        if(empty($_GET['ifcf7_nonce']) or !wp_verify_nonce($_GET['ifcf7_nonce'], 'ifcf7-inserted-user_' . $_GET['inserted_user_id'])){
+			return new \WP_Error('ifcf7_error', __('The link you followed has expired.'));
+		}
+		return (int) $_GET['inserted_user_id'];
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	public static function get_updated_post_id(){
+        if(empty($_GET['updated_post_id'])){
+            return 0;
+        }
+        if(empty($_GET['ifcf7_nonce']) or !wp_verify_nonce($_GET['ifcf7_nonce'], 'ifcf7-updated-post_' . $_GET['updated_post_id'])){
+			return new \WP_Error('ifcf7_error', __('The link you followed has expired.'));
+		}
+		return (int) $_GET['updated_post_id'];
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	public static function get_updated_user_id(){
+        if(empty($_GET['updated_user_id'])){
+            return 0;
+        }
+        if(empty($_GET['ifcf7_nonce']) or !wp_verify_nonce($_GET['ifcf7_nonce'], 'ifcf7-updated-user_' . $_GET['updated_user_id'])){
+			return new \WP_Error('ifcf7_error', __('The link you followed has expired.'));
+		}
+		return (int) $_GET['updated_user_id'];
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public static function load(){
 		add_action('wpcf7_enqueue_scripts', [__CLASS__, 'wpcf7_enqueue_scripts']);
