@@ -14,7 +14,7 @@ final class TinyMCE {
 		$wrapper->addClass('d-none');
 		$textarea = $wrapper->find('textarea', 0);
 		ob_start();
-		wp_editor(html_entity_decode($textarea->innertext), $tag->name, [
+		wp_editor(wp_specialchars_decode($textarea->innertext), $tag->name, [
 			'editor_class' => $textarea->class,
 			'media_buttons' => false,
 			'quicktags' => false,
@@ -57,6 +57,22 @@ final class TinyMCE {
 
     public static function load(){
 		add_filter('ifcf7_form_tag_html', [__CLASS__, 'form_tag_html'], 30, 5);
+		add_filter('wpcf7_mail_tag_replaced_textarea', [__CLASS__, 'revert_html'], 10, 4);
+		add_filter('wpcf7_mail_tag_replaced_textarea*', [__CLASS__, 'revert_html'], 10, 4);
+    }
+
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    public static function revert_html($replaced, $submitted, $html, $mail_tag){
+		$form_tag = $mail_tag->corresponding_form_tag();
+		if(!$form_tag->has_option('tinymce')){
+			return $replaced;
+		}
+		$replaced = $submitted;
+		if(null !== $replaced){
+			$replaced = wpcf7_flat_join($submitted);
+		}
+		return $replaced;
     }
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -109,7 +109,7 @@ final class Helper {
         if(null === $contact_form){
             return false;
         }
-        $skip_mail = $this->skip_mail($contact_form);
+        $skip_mail = self::skip_mail($contact_form);
         if($skip_mail){
         	return true;
         }
