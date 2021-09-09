@@ -22,7 +22,7 @@ final class Loader {
 		}
 		return wp_add_inline_script($handle, $data, $position);
 	}
-	
+
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	public static function enqueue_asset($handle = '', $src = '', $deps = []){
@@ -50,7 +50,7 @@ final class Loader {
 				break;
 		}
 	}
-	
+
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public static function get_file(){
@@ -61,7 +61,7 @@ final class Loader {
 
     public static function load($file = ''){
     	self::$file = $file;
-		add_action('plugins_loaded', [__CLASS__, 'plugins_loaded']);		
+		add_action('plugins_loaded', [__CLASS__, 'plugins_loaded']);
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -69,6 +69,9 @@ final class Loader {
     public static function plugins_loaded(){
     	if(!function_exists('is_plugin_active')){
             require_once(ABSPATH . 'wp-admin/includes/plugin.php');
+        }
+        if(is_plugin_active('vidsoe/vidsoe.php')){
+            vidsoe()->build_update_checker('https://github.com/vidsoe/ifcf7', self::$file, 'ifcf7');
         }
 		if(!is_plugin_active('contact-form-7/wp-contact-form-7.php')){
             return;

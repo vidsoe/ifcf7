@@ -134,7 +134,7 @@ final class Register {
 		$user_login = self::get_posted_data('user_login');
 		$user_password = self::get_posted_data('user_password');
 		if('' === $user_login){
-			$user_login = $user_email;
+			$user_login = md5($user_email);
 		}
 		if('' === $user_password){
 			$generated_password = true;

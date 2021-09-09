@@ -28,27 +28,66 @@ final class Utilities {
         if('mail_sent' !== $response['status']){
             return '';
         }
-        $url = self::redirect_raw_url();
-		if(!wpcf7_is_url($url)){
-			return '';
-		}
-		$inserted_post_id = Storage::get_inserted_post_id();
+        $inserted_post_id = Storage::get_inserted_post_id();
 		$inserted_user_id = Storage::get_inserted_user_id();
+        $nonce = '';
 		$updated_post_id = Storage::get_updated_post_id();
 		$updated_user_id = Storage::get_updated_user_id();
-        $nonce = '';
+        $url = self::redirect_raw_url();
+		if(!wpcf7_is_url($url)){
+            switch(\WP_REST_Request::canonicalize_header_name($url)){
+                case 'inserted_post':
+                    if(empty($inserted_post_id)){
+                        return '';
+                    }
+                    $url = get_permalink($inserted_post_id);
+                    $url = add_query_arg('inserted_post', 1, $url);
+                    $nonce = wp_create_nonce('ifcf7-inserted-post_' . $inserted_post_id);
+                    break;
+                case 'inserted_user':
+                    if(empty($inserted_user_id)){
+                        return '';
+                    }
+                    $url = get_author_posts_url($inserted_user_id);
+                    $url = add_query_arg('inserted_user', 1, $url);
+                    $nonce = wp_create_nonce('ifcf7-inserted-user_' . $inserted_user_id);
+                    break;
+                case 'updated_post':
+                    if(empty($updated_post_id)){
+                        return '';
+                    }
+                    $url = get_permalink($updated_post_id);
+                    $url = add_query_arg('updated_post', 1, $url);
+                    $nonce = wp_create_nonce('ifcf7-updated-post_' . $updated_post_id);
+                    break;
+                case 'updated_user':
+                    if(empty($updated_user_id)){
+                        return '';
+                    }
+                    $url = get_author_posts_url($updated_user_id);
+                    $url = add_query_arg('updated_user', 1, $url);
+                    $nonce = wp_create_nonce('ifcf7-updated-user_' . $updated_user_id);
+                    break;
+                default:
+                    return '';
+            }
+            if(!empty($nonce)){
+                $url = add_query_arg('ifcf7_nonce', $nonce, $url);
+            }
+            return $url;
+		}
         if(!empty($inserted_post_id)){
             $url = add_query_arg('inserted_post_id', $inserted_post_id, $url);
             $nonce = wp_create_nonce('ifcf7-inserted-post_' . $inserted_post_id);
         } elseif(!empty($inserted_user_id)){
             $url = add_query_arg('inserted_user_id', $inserted_user_id, $url);
-            $nonce = wp_create_nonce('ifcf7-inserted-user_' . $inserted_post_id);
+            $nonce = wp_create_nonce('ifcf7-inserted-user_' . $inserted_user_id);
         } elseif(!empty($updated_post_id)){
             $url = add_query_arg('updated_post_id', $updated_post_id, $url);
-            $nonce = wp_create_nonce('ifcf7-updated-post_' . $inserted_post_id);
+            $nonce = wp_create_nonce('ifcf7-updated-post_' . $updated_post_id);
         } elseif(!empty($updated_user_id)){
             $url = add_query_arg('updated_user_id', $updated_user_id, $url);
-            $nonce = wp_create_nonce('ifcf7-updated-user_' . $inserted_post_id);
+            $nonce = wp_create_nonce('ifcf7-updated-user_' . $updated_user_id);
         }
         if(!empty($nonce)){
             $url = add_query_arg('ifcf7_nonce', $nonce, $url);
