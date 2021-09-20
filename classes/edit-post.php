@@ -91,25 +91,6 @@ final class Edit_Post {
 		return $output;
 	}*/
 
-	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-	private static function sanitize_post_id($post_id){
-		$post = null;
-		if(is_numeric($post_id)){
-			$post = get_post($post_id);
-		} else {
-			if('current' === $post_id){
-				if(in_the_loop()){
-					$post = get_post();
-				}
-			}
-		}
-		if(null === $post){
-			return 0;
-		}
-		return $post->ID;
-	}
-
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	//
 	// public
@@ -162,6 +143,25 @@ final class Edit_Post {
 		add_filter('wpcf7_form_elements', [__CLASS__, 'wpcf7_form_elements']);
 		add_filter('wpcf7_form_hidden_fields', [__CLASS__, 'wpcf7_form_hidden_fields']);
     }
+
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	public static function sanitize_post_id($post_id){
+		$post = null;
+		if(is_numeric($post_id)){
+			$post = get_post($post_id);
+		} else {
+			if('current' === $post_id){
+				if(in_the_loop()){
+					$post = get_post();
+				}
+			}
+		}
+		if(null === $post){
+			return 0;
+		}
+		return $post->ID;
+	}
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

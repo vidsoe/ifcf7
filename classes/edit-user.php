@@ -111,25 +111,6 @@ final class Edit_User {
 		return $output;
 	}*/
 
-	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-	private static function sanitize_user_id($user_id){
-		$user = false;
-		if(is_numeric($user_id)){
-			$user = get_userdata($user_id);
-		} else {
-			if('current' === $user_id){
-				if(is_user_logged_in()){
-					$user = wp_get_current_user();
-				}
-			}
-		}
-		if(!$user){
-			return 0;
-		}
-		return $user->ID;
-	}
-
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	//
 	// public
@@ -182,6 +163,25 @@ final class Edit_User {
 		add_filter('wpcf7_form_elements', [__CLASS__, 'wpcf7_form_elements']);
 		add_filter('wpcf7_form_hidden_fields', [__CLASS__, 'wpcf7_form_hidden_fields']);
     }
+
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	public static function sanitize_user_id($user_id){
+		$user = false;
+		if(is_numeric($user_id)){
+			$user = get_userdata($user_id);
+		} else {
+			if('current' === $user_id){
+				if(is_user_logged_in()){
+					$user = wp_get_current_user();
+				}
+			}
+		}
+		if(!$user){
+			return 0;
+		}
+		return $user->ID;
+	}
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

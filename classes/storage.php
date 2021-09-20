@@ -66,6 +66,62 @@ final class Storage {
 	//
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+	public static function form_tag_html($html, $tag, $type, $basetype, $html_orig){
+		if('file' !== $type){
+			return $html;
+		}
+        $contact_form = wpcf7_get_current_contact_form();
+    	if(null === $contact_form){
+    		return $html;
+    	}
+        $meta_type = '';
+    	$object_id = 0;
+    	$post_id = $contact_form->shortcode_attr('post_id');
+    	if(!empty($post_id)){
+    		$meta_type = 'post';
+    		$object_id = Edit_Post::sanitize_post_id($post_id);
+    	}
+    	$user_id = $contact_form->shortcode_attr('user_id');
+    	if(!empty($user_id)){
+    		$meta_type = 'user';
+    		$object_id = Edit_User::sanitize_user_id($user_id);
+    	}
+    	if(!in_array($meta_type, ['post', 'user'])){
+    		return $html;
+    	}
+    	if(empty($object_id)){
+    		return $html;
+    	}
+        $attachment_ids = get_metadata($meta_type, $object_id, $tag->name . '_id');
+        if(empty($attachment_ids)){
+    		return $html;
+    	}
+        $html_orig = $html;
+        $html = '<div class="ifcf7-attachments-container" data-ifcf7-key="' . $tag->name . '" data-ifcf7-id="' . $object_id . '" data-ifcf7-type="' . $meta_type . '">';
+    	foreach($attachment_ids as $attachment_id){
+            $metadata = wp_prepare_attachment_for_js($attachment_id);
+    		$html .= '<div class="border-top d-flex ifcf7-attachment-container mb-3 pt-3" data-ifcf7-id="' . $attachment_id . '">';
+            $url = $metadata['icon'];
+            if('image' === $metadata['type'] and !empty($metadata['sizes']['thumbnail'])){
+                $url = $metadata['sizes']['thumbnail']['url'];
+            }
+    		$html .= '<img class="img-thumbnail" src="' . $url . '" style="width: 60px;">';
+    		$html .= '<div class="flex-grow-1 pl-3">';
+    		$html .= '<div class="text-dark">' . $metadata['name'] . '</div>';
+    		$html .= '<div class="small text-muted">' . $metadata['dateFormatted'] . ' &bull; ' . $metadata['filesizeHumanReadable'];
+    		if(!empty($metadata['nonces']['delete'])){
+    			$html .= ' &bull; <a href="#ifcf7-delete-attachment" class="text-danger ifcf7-delete-attachment" data-ifcf7-nonce="' . $metadata['nonces']['delete'] . '">Delete</a>';
+    		}
+    		$html .= '</div>';
+    		$html .= '</div>';
+    		$html .= '</div>';
+    	}
+    	$html .= '</div>';
+        return $html . $html_orig;
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 	public static function get_inserted_post_id(){
 		return self::$inserted_post_id;
     }
@@ -98,6 +154,16 @@ final class Storage {
             'show_ui' => true,
             'supports' => ['custom-fields', 'title'],
         ]);
+    }
+
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    public static function load(){
+        add_action('rest_api_init', [__CLASS__, 'rest_api_init']);
+        add_action('wpcf7_enqueue_scripts', [__CLASS__, 'wpcf7_enqueue_scripts']);
+        add_filter('ifcf7_form_tag_html', [__CLASS__, 'form_tag_html'], 30, 5);
+		add_filter('init', [__CLASS__, 'init']);
+		add_filter('wpcf7_before_send_mail', [__CLASS__, 'wpcf7_before_send_mail'], 20, 3);
     }
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -161,8 +227,6 @@ final class Storage {
             }
         }
         foreach($submission->uploaded_files() as $key => $value){
-            delete_metadata($meta_type, $object_id, $key . '_attachment_id');
-            delete_metadata($meta_type, $object_id, $key . '_filename');
             foreach((array) $value as $single){
                 if('post' === $meta_type){
                     $post_id = $object_id;
@@ -170,24 +234,43 @@ final class Storage {
                     $post_id = 0;
                 }
                 $attachment_id = Files::upload_file($single, $post_id);
-                if(is_wp_error($attachment_id)){
-                    add_metadata($meta_type, $object_id, $key . '_attachment_id', 0);
-                    add_metadata($meta_type, $object_id, $key . '_filename', $attachment_id->get_error_message());
-                } else {
-                    add_metadata($meta_type, $object_id, $key . '_attachment_id', $attachment_id);
-                    add_metadata($meta_type, $object_id, $key . '_filename', wp_basename($single));
+                if(!is_wp_error($attachment_id)){
+                    add_metadata($meta_type, $object_id, $key . '_id', $attachment_id);
                 }
             }
+            delete_metadata($meta_type, $object_id, $key);
         }
 		do_action('ifcf7_' . $action . '_' . $meta_type, $object_id, $contact_form, $submission);
 		do_action('ifcf7_store_submission', $action, $meta_type, $object_id, $contact_form, $submission);
     }
 
-	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    public static function load(){
-		add_filter('init', [__CLASS__, 'init']);
-		add_filter('wpcf7_before_send_mail', [__CLASS__, 'wpcf7_before_send_mail'], 20, 3);
+    public static function rest_api_init(){
+        register_rest_route('ifcf7/v1', '/uploaded-files/(?P<meta_type>post|user)/(?P<object_id>\d+)/(?P<meta_key>[\w-]+)/(?P<meta_value>\d+)', [
+    		'callback' => function($request){
+    			$meta_type = $request->get_param('meta_type');
+    			$object_id = $request->get_param('object_id');
+    			$meta_key = $request->get_param('meta_key');
+    			$meta_value = $request->get_param('meta_value');
+                $post = wp_delete_attachment($meta_value);
+                if(empty($post)){
+                    return [
+        				'ifcf7_status' => 0,
+        			];
+                }
+    			return [
+    				'ifcf7_status' => delete_metadata($meta_type, $object_id, $meta_key . '_id', $meta_value),
+    			];
+    		},
+    		'methods' => 'DELETE',
+    		'permission_callback' => function($request){
+    			$object_id = $request->get_param('object_id');
+    			$meta_value = $request->get_param('meta_value');
+    			$nonce = $request->get_param('ifcf7_nonce');
+    			return (current_user_can('edit_post', $object_id) and wp_verify_nonce($nonce, 'delete-post_' . $meta_value));
+    		},
+    	]);
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -211,6 +294,14 @@ final class Storage {
             return;
         }
         self::store_submission('insert', 'post', $post_id, $contact_form, $submission);
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    public static function wpcf7_enqueue_scripts(){
+        wp_enqueue_script('wp-api');
+		Loader::enqueue_asset('uploaded-files', 'uploaded-files.js', ['wp-api']);
+		Loader::add_inline_script('uploaded-files', 'ifcf7_uploaded_files.load();');
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
