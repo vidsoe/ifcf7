@@ -260,7 +260,7 @@ final class Storage {
         			];
                 }
     			return [
-    				'ifcf7_status' => delete_metadata($meta_type, $object_id, $meta_key . '_id', $meta_value),
+    				'ifcf7_status' => (int) delete_metadata($meta_type, $object_id, $meta_key . '_id', $meta_value),
     			];
     		},
     		'methods' => 'DELETE',
