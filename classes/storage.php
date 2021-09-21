@@ -97,7 +97,7 @@ final class Storage {
     		return $html;
     	}
         $html_orig = $html;
-        $html = '<div class="ifcf7-attachments-container" data-ifcf7-key="' . $tag->name . '" data-ifcf7-id="' . $object_id . '" data-ifcf7-type="' . $meta_type . '">';
+        $html = '<div class="ifcf7-attachments-container" data-ifcf7-key="' . $tag->name . '" data-ifcf7-id="' . $object_id . '" data-ifcf7-message="' . __('Deleting...') . '" data-ifcf7-type="' . $meta_type . '">';
     	foreach($attachment_ids as $attachment_id){
             $metadata = wp_prepare_attachment_for_js($attachment_id);
     		$html .= '<div class="border-top d-flex ifcf7-attachment-container mb-3 pt-3" data-ifcf7-id="' . $attachment_id . '">';
@@ -110,7 +110,7 @@ final class Storage {
     		$html .= '<div class="text-dark">' . $metadata['name'] . '</div>';
     		$html .= '<div class="small text-muted">' . $metadata['dateFormatted'] . ' &bull; ' . $metadata['filesizeHumanReadable'];
     		if(!empty($metadata['nonces']['delete'])){
-    			$html .= ' &bull; <a href="#ifcf7-delete-attachment" class="text-danger ifcf7-delete-attachment" data-ifcf7-nonce="' . $metadata['nonces']['delete'] . '">Delete</a>';
+    			$html .= ' &bull; <a href="#" class="text-danger ifcf7-delete-attachment" data-ifcf7-nonce="' . $metadata['nonces']['delete'] . '">' . __('Delete') . '</a>';
     		}
     		$html .= '</div>';
     		$html .= '</div>';

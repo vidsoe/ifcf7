@@ -9,6 +9,7 @@ var ifcf7_uploaded_files = {
                 if(confirm('Are you sure you want to delete these file?')){
                     var attachment_container = $(this).parents('.ifcf7-attachment-container');
                     var attachments_container = $(this).parents('.ifcf7-attachments-container');
+					var message = attachments_container.data('ifcf7-message');
                     var meta_key = attachments_container.data('ifcf7-key');
                     var meta_type = attachments_container.data('ifcf7-type');
                     var meta_value = attachment_container.data('ifcf7-id');
@@ -17,7 +18,7 @@ var ifcf7_uploaded_files = {
                     attachment_container.css({
                         opacity: 0.5,
                     });
-                    $(this).text('Deleting...');
+                    $(this).text(message);
                     $.ajax({
                         beforeSend: function(xhr){
                             xhr.setRequestHeader('X-WP-Nonce', wpApiSettings.nonce);
