@@ -31,7 +31,7 @@ final class Data_Options {
         }
         foreach($options as $option){
             if(!empty(self::$data_options[$option])){
-                $data = array_merge((array) $data, self::$data_options[$option]);
+                $data = (array) $data + self::$data_options[$option];
             }
         }
 		return $data;

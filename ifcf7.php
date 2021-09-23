@@ -12,7 +12,7 @@ Plugin URI: https://github.com/vidsoe/ifcf7
 Requires at least: 5.6
 Requires PHP: 5.6
 Text Domain: ifcf7
-Version: 0.9.20.2
+Version: 0.9.23
 */
 
 defined('ABSPATH') or die('Hi there! I\'m just a plugin, not much I can do when called directly.');
