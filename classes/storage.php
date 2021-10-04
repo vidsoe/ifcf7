@@ -107,7 +107,7 @@ final class Storage {
             }
     		$html .= '<img class="img-thumbnail" src="' . $url . '" style="width: 60px;">';
     		$html .= '<div class="flex-grow-1 pl-3">';
-    		$html .= '<div class="text-dark">' . $metadata['name'] . '</div>';
+    		$html .= '<div class="text-dark"><a href="' . $metadata['url'] . '" target="_blank">' . $metadata['name'] . '</a></div>';
     		$html .= '<div class="small text-muted">' . $metadata['dateFormatted'] . ' &bull; ' . $metadata['filesizeHumanReadable'];
     		if(!empty($metadata['nonces']['delete'])){
     			$html .= ' &bull; <a href="#" class="text-danger ifcf7-delete-attachment" data-ifcf7-nonce="' . $metadata['nonces']['delete'] . '">' . __('Delete') . '</a>';
