@@ -175,10 +175,16 @@ final class Storage {
 		if(!in_array($meta_type, ['post', 'user'])){
 			return;
 		}
-		if('post' === $meta_type and empty(get_post($object_id))){
-			return;
-		} elseif('user' === $meta_type and empty(get_userdata($object_id))){
-			return;
+		if('post' === $meta_type){
+            $post = get_post($object_id);
+            if(empty($post)){
+                return;
+            }
+		} elseif('user' === $meta_type){
+            $user = get_userdata($object_id);
+            if(empty($user)){
+                return;
+            }
 		}
 		if(null === $contact_form){
 			$contact_form = wpcf7_get_current_contact_form();
@@ -226,19 +232,26 @@ final class Storage {
                 update_metadata($meta_type, $object_id, $key, $value);
             }
         }
+        if('post' === $meta_type){
+            $post_id = $object_id;
+        } else {
+            $post_id = 0;
+        }
         foreach($submission->uploaded_files() as $key => $value){
             foreach((array) $value as $single){
-                if('post' === $meta_type){
-                    $post_id = $object_id;
-                } else {
-                    $post_id = 0;
-                }
                 $attachment_id = Files::upload_file($single, $post_id);
                 if(!is_wp_error($attachment_id)){
                     add_metadata($meta_type, $object_id, $key . '_id', $attachment_id);
                 }
             }
             delete_metadata($meta_type, $object_id, $key);
+        }
+        if('post' === $meta_type){
+            do_action('ifcf7_' . $action . '_post_' . $post->post_type, $object_id, $contact_form, $submission);
+        } else {
+            foreach($user->roles as $role){
+                do_action('ifcf7_' . $action . '_user_' . $role, $object_id, $contact_form, $submission);
+            }
         }
 		do_action('ifcf7_' . $action . '_' . $meta_type, $object_id, $contact_form, $submission);
 		do_action('ifcf7_store_submission', $action, $meta_type, $object_id, $contact_form, $submission);
@@ -282,9 +295,11 @@ final class Storage {
         if(!$submission->is('init')){
             return; // prevent conflicts with actions and other plugins
         }
+        $uniqid = uniqid();
         $post_id = wp_insert_post([
+            'post_name' => 'ifcf7-submission-' . $uniqid,
 			'post_status' => self::get_post_status($contact_form),
-			'post_title' => '[ifcf7-submission]',
+			'post_title' => '[ifcf7-submission ' . $uniqid . ']',
 			'post_type' => self::get_post_type($contact_form),
 		], true);
         if(is_wp_error($post_id)){
