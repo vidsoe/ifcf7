@@ -87,6 +87,20 @@ final class Loader {
 				call_user_func([$class, 'load']);
 			}
 		}
+        $stylesheet_directory = get_stylesheet_directory();
+        if(@is_dir($stylesheet_directory. '/ifcf7/classes')){
+            foreach(glob($stylesheet_directory . '/ifcf7/classes/*.php') as $file){
+    			$class = basename($file, '.php');
+    			if('loader' === $class){
+    				continue;
+    			}
+    			$class = __NAMESPACE__ . '\\' . str_replace('-', '_', $class);
+    			require_once($file);
+    			if(is_callable([$class, 'load'])){
+    				call_user_func([$class, 'load']);
+    			}
+    		}
+        }
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

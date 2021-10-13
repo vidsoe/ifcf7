@@ -72,6 +72,22 @@ final class Helper {
 	//
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+	public static function get_action($contact_form = null){
+        if(empty($contact_form)){
+    		$contact_form = wpcf7_get_current_contact_form();
+    	}
+        if(empty($contact_form)){
+    		return '';
+    	}
+    	$action = $contact_form->pref('action');
+    	if(empty($action)){
+    		return '';
+    	}
+    	return \WP_REST_Request::canonicalize_header_name($action);
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 	public static function get_meta_data($name = ''){
         if(empty(self::$meta_data)){
             self::setup_meta_data();
@@ -98,6 +114,100 @@ final class Helper {
             return '';
         }
         return self::$posted_data[$name];
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    public static function invalid_fields($fields = [], $contact_form = null){
+        if(empty($contact_form)){
+    		$contact_form = wpcf7_get_current_contact_form();
+    	}
+        $invalid = [];
+        if(empty($contact_form)){
+    		return $invalid;
+    	}
+        $tags = wp_list_pluck($contact_form->scan_form_tags(), 'type', 'name');
+        foreach($fields as $name => $type){
+    		if(!empty($tags[$name])){
+                if(!in_array($tags[$name], (array) $type)){
+        			$invalid[] = $name;
+        		}
+    		}
+    	}
+        return $invalid;
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    public static function is($action = '', $contact_form = null){
+    	return ($action === self::action($contact_form));
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    public static function mail($contact_form = null, $submission = null){
+        if(empty($contact_form)){
+    		$contact_form = wpcf7_get_current_contact_form();
+    	}
+        if(empty($contact_form)){
+    		return;
+    	}
+        if(empty($submission)){
+            $submission = \WPCF7_Submission::get_instance();
+        }
+        if(empty($submission)){
+            return;
+        }
+        $response = $submission->get_response();
+        $status = $submission->get_status();
+        if(self::skip_mail($contact_form)){
+            $message = $contact_form->message('mail_sent_ok');
+            if(empty($response)){
+                $response = $message;
+            } else {
+                $response .= ' ' . $message;
+            }
+            $status = 'mail_sent';
+    	} else {
+    		if(self::send_mail($contact_form)){
+                $message = $contact_form->message('mail_sent_ok');
+                if(empty($response)){
+                    $response = $message;
+                } else {
+                    $response .= ' ' . $message;
+                }
+    			$status = 'mail_sent';
+    		} else {
+                $message = $contact_form->message('mail_sent_ng');
+                if(empty($response)){
+                    $response = $message;
+                } else {
+                    $response .= ' ' . $message;
+                }
+                $status = 'mail_failed';
+    		}
+    	}
+        $submission->set_response(wp_strip_all_tags($response));
+        $submission->set_status($status);
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    public static missing_fields($fields = [], $contact_form = null){
+        if(empty($contact_form)){
+    		$contact_form = wpcf7_get_current_contact_form();
+    	}
+        $missing = [];
+        if(empty($contact_form)){
+    		return $missing;
+    	}
+        $tags = wp_list_pluck($contact_form->scan_form_tags(), 'type', 'name');
+        foreach(array_keys($fields) as $name){
+    		if(empty($tags[$name])){
+    			$missing[] = $name;
+    		}
+    	}
+        return $missing;
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

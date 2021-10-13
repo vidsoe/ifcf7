@@ -8,7 +8,7 @@ final class Retrieve_Password {
 	//
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	private static $posted_data = [];
+	private static $post_id = 0, $posted_data = [];
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -43,6 +43,30 @@ final class Retrieve_Password {
 	//
 	// public
 	//
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    public static function custom_form(){
+        if(empty(self::$post_id)){
+            return;
+        }
+        $url = get_permalink(self::$post_id);
+    	if(!empty($_GET)){
+    		$url = add_query_arg($_GET, $url);
+    	}
+    	wp_safe_redirect($url);
+    	exit;
+    }
+
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    public static function custom_page($post_id = 0){
+        $post = get_post($post_id);
+        if(!$post or 'page' !== $post->post_type or 'publish' !== $post->post_status){
+            return;
+        }
+        self::$post_id = $post->ID;
+    }
+
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	public static function do_shortcode_tag($output, $tag, $attr, $m){
@@ -89,12 +113,22 @@ final class Retrieve_Password {
 			//$error = bc_first_p($error);
 			return '<div class="alert alert-warning" role="alert">' . $error . '</div>';
 		}
-		return $output;
+		$error = '';
+		if(isset($_GET['error'])){
+			if('invalidkey' === $_GET['error']){
+				$error = __('<strong>Error</strong>: Your password reset link appears to be invalid. Please request a new link below.');
+			} elseif ( 'expiredkey' === $_GET['error'] ) {
+				$error = __('<strong>Error</strong>: Your password reset link has expired. Please request a new link below.');
+			}
+		}
+		return $error . $output;
 	}
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public static function load(){
+		add_action('login_form_lostpassword', [__CLASS__, 'custom_form']);
+        add_action('login_form_retrievepassword', [__CLASS__, 'custom_form']);
 		add_action('wpcf7_before_send_mail', [__CLASS__, 'wpcf7_before_send_mail'], 10, 3);
 		add_filter('do_shortcode_tag', [__CLASS__, 'do_shortcode_tag'], 10, 4);
 		add_filter('wpcf7_posted_data', [__CLASS__, 'wpcf7_posted_data']);
