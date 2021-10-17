@@ -140,7 +140,7 @@ final class Helper {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     public static function is($action = '', $contact_form = null){
-    	return ($action === self::action($contact_form));
+    	return ($action === self::get_action($contact_form));
     }
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -161,11 +161,8 @@ final class Helper {
         $response = $submission->get_response();
         $status = $submission->get_status();
         if(self::skip_mail($contact_form)){
-            $message = $contact_form->message('mail_sent_ok');
             if(empty($response)){
-                $response = $message;
-            } else {
-                $response .= ' ' . $message;
+                $response = $contact_form->message('mail_sent_ok');
             }
             $status = 'mail_sent';
     	} else {
@@ -193,7 +190,7 @@ final class Helper {
 
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    public static missing_fields($fields = [], $contact_form = null){
+    public static function missing_fields($fields = [], $contact_form = null){
         if(empty($contact_form)){
     		$contact_form = wpcf7_get_current_contact_form();
     	}
