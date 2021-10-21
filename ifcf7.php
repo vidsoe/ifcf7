@@ -18,3 +18,5 @@ Version: 0.10.17
 defined('ABSPATH') or die('Hi there! I\'m just a plugin, not much I can do when called directly.');
 require_once(plugin_dir_path(__FILE__) . 'classes/loader.php');
 IFCF7\Loader::load(__FILE__);
+
+//test 6
