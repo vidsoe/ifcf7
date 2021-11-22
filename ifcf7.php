@@ -12,11 +12,9 @@ Plugin URI: https://github.com/vidsoe/ifcf7
 Requires at least: 5.6
 Requires PHP: 5.6
 Text Domain: ifcf7
-Version: 0.10.17
+Version: 0.11.22
 */
 
 defined('ABSPATH') or die('Hi there! I\'m just a plugin, not much I can do when called directly.');
 require_once(plugin_dir_path(__FILE__) . 'classes/loader.php');
 IFCF7\Loader::load(__FILE__);
-
-//test 6
