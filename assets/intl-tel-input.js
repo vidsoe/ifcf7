@@ -18,7 +18,7 @@ var ifcf7_intl_tel_input = {
             jQuery('.ifcf7-intl-tel-input').on('input propertychange', function(){
                 var name = jQuery(this).attr('name');
                 var phone_number = ifcf7_intl_tel_input.fields[name].getNumber();
-                jQuery(this).next('.ifcf7-intl-tel-input-hidden').val(phone_number);
+                jQuery(this).parents('.wpcf7-form-control-wrap').find('.ifcf7-intl-tel-input-hidden').val(phone_number);
             });
 		});
 	},
